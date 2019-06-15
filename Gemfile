@@ -1,4 +1,15 @@
 source "https://rubygems.org"
 
-# Specify your gem's dependencies in mellat.gemspec
-gemspec
+gem 'savon'
+gem 'rest-client'
+
+group :development, :test do
+  gem 'rspec'
+  gem 'webmock'
+  gem 'rubocop'
+end
+
+group :test do
+  gem 'simplecov', require: false
+  gem 'rails'
+end
