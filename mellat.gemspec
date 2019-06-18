@@ -6,7 +6,7 @@ require "mellat/version"
 Gem::Specification.new do |spec|
   spec.name          = "bank_gateway_mellat"
   spec.version       = Mellat::VERSION
-  spec.authors       = ["Mohammad", "Amirhossein"]
+  spec.authors       = ["Mohammad"]
   spec.email         = ["mohammad.shamami21@gmail.com"]
   spec.summary       = 'Help you to communicate better with Mellat payment gateway'
   spec.description   = 'Help you to handle all requests to Mellat payment gateway'
