@@ -1,7 +1,7 @@
 source "https://rubygems.org"
 
 gem 'savon'
-gem 'rest-client'
+# gem 'rest-client'
 
 group :development, :test do
   gem 'rspec'
