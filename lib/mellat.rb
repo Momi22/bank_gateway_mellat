@@ -4,6 +4,10 @@ require_relative 'mellat/payment_request'
 require_relative 'mellat/payment_verification'
 require_relative 'mellat/configuration'
 
+require 'savon'
+require 'yaml'
+require 'json'
+
 module Mellat
 
   def self.up?
