@@ -1,9 +1,11 @@
+require 'active_support/all'
+
 module Mellat
 
   class PaymentRequest
-    def apply(args = {})
+    def apply(params = {})
       config = Mellat.configuration
-      request_parameters = create_payment_parameters(args)
+      request_parameters = create_payment_parameters(params)
       response = send_rest_requests(
           config.web_service_wsdl,
           config.proxy,
@@ -15,18 +17,18 @@ module Mellat
 
     private
 
-    def create_payment_parameters(args = {})
+    def create_payment_parameters(params = {})
       config = Mellat.configuration
       {
           terminalId: config.terminal_id,
           userName: config.username,
           userPassword: config.password,
-          orderId: args[:order_id],
-          amount: args[:amount],
+          orderId: params[:order_id],
+          amount: params[:amount],
           localDate: calculate_local_date,
           localTime: calculate_local_time,
-          additionalData: args[:additional_data],
-          callBackUrl: args[:redirect_url]
+          additionalData: params[:additional_data],
+          callBackUrl: params[:redirect_url]
       }
     end
 
@@ -42,6 +44,7 @@ module Mellat
       client = Savon.client do
         wsdl url
         proxy proxy
+        namespace 'http://interfaces.core.sw.bps.com/'
       end
       return client.call :bp_cumulative_dynamic_pay_request, message: parameters
     rescue Net::OpenTimeout
@@ -53,7 +56,7 @@ module Mellat
     end
 
     def parse_token_result(response)
-      response_code = JSON.parse(response.body)
+      response_code = response.body[:bp_cumulative_dynamic_pay_request_response][:return]
       status_code = response_code.split(',').first
       return response_code.split(',').last if status_code == '0'
       raise 'server is not capable to response!' if status_code == '34'

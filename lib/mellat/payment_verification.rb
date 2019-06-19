@@ -1,9 +1,9 @@
 module Mellat
   class PaymentVerification
 
-    def verify(args = {})
+    def verify(params = {})
       config = Mellat.configuration
-      request_parameters = create_verify_parameters(args)
+      request_parameters = create_verify_parameters(params)
       response = verify_the_payment(
           config.web_service_wsdl,
           config.proxy,
@@ -13,15 +13,15 @@ module Mellat
       parse_verify_result(response)
     end
 
-    def create_verify_parameters(args = {})
+    def create_verify_parameters(params = {})
       config = Mellat.configuration
       {
           terminalId: config.terminal_id,
           userName: config.username,
           userPassword: config.password,
-          orderId: args[:order_id],
-          saleOrderId: args[:sale_order_id],
-          saleReferenceId: args[:sale_reference_id]
+          orderId: params[:order_id],
+          saleOrderId: params[:sale_order_id],
+          saleReferenceId: params[:sale_reference_id]
       }
     end
 
@@ -29,6 +29,7 @@ module Mellat
       client = Savon.client do
         wsdl url
         proxy proxy
+        namespace 'http://interfaces.core.sw.bps.com/'
       end
       return client.call :bp_verify_request, message: parameters
     rescue Net::OpenTimeout
@@ -40,7 +41,7 @@ module Mellat
     end
 
     def parse_verify_result(response)
-      response_code = JSON.parse(response.body)
+      response_code = response.body[:bp_verify_request][:return]
       status_code = response_code
       return true if status_code == '0'
       raise "Something Weird Happened - your Error code is #{status_code}" \
