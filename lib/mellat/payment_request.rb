@@ -1,39 +1,40 @@
-require 'active_support/all'
+# frozen_string_literal: true
+
+require 'active_support/core_ext/integer/time.rb'
 
 module Mellat
-
   class PaymentRequest
     def apply(params = {})
       config = Mellat.configuration
-      request_parameters = create_payment_parameters(params)
+      request_parameters = create_payment_params(params)
       response = send_rest_requests(
-          config.web_service_wsdl,
-          config.proxy,
-          request_parameters,
-          config.retry_count
-      )
+       'https://bpm.shaparak.ir/pgwchannel/services/pgw?wsdl',
+       config.proxy,
+       request_parameters,
+       config.retry_count
+     )
       parse_token_result(response)
     end
 
     private
 
-    def create_payment_parameters(params = {})
+    def create_payment_params(params)
       config = Mellat.configuration
       {
-          terminalId: config.terminal_id,
-          userName: config.username,
-          userPassword: config.password,
-          orderId: params[:order_id],
-          amount: params[:amount],
-          localDate: calculate_local_date,
-          localTime: calculate_local_time,
-          additionalData: params[:additional_data],
-          callBackUrl: params[:redirect_url]
+        terminalId: config.terminal_id,
+        userName: config.username,
+        userPassword: config.password,
+        orderId: params[:order_id],
+        amount: params[:amount],
+        localDate: calculate_local_date,
+        localTime: calculate_local_time,
+        additionalData: params[:additional_data],
+        callBackUrl: params[:redirect_url]
       }
     end
 
     def calculate_local_date
-      Date.today.in_time_zone('Asia/Tehran').strftime('%Y%m%d')
+      Time.now.in_time_zone('Asia/Tehran').strftime('%Y%m%d')
     end
 
     def calculate_local_time
@@ -41,18 +42,19 @@ module Mellat
     end
 
     def send_rest_requests(url, proxy, parameters, retry_to)
-      client = Savon.client do
+      client = Savon::client do
+        namespace 'http://interfaces.core.sw.bps.com/'
         wsdl url
         proxy proxy
-        namespace 'http://interfaces.core.sw.bps.com/'
       end
-      return client.call :bp_cumulative_dynamic_pay_request, message: parameters
+      client.call :bp_cumulative_dynamic_pay_request, message: parameters
     rescue Net::OpenTimeout
       retry if (retry_to -= 1).positive?
-      return { error: 'Mellat is not available right now, calling web service got time out' }
-    rescue StandardError => exception
+      raise 'Saman is not available right now, calling web service got time out'
+    rescue Savon::HTTPError => error
       retry if (retry_to -= 1).positive?
-      return { error: exception.message }
+      Logger.log error.http.code
+      raise
     end
 
     def parse_token_result(response)
@@ -61,8 +63,7 @@ module Mellat
       return response_code.split(',').last if status_code == '0'
       raise 'server is not capable to response!' if status_code == '34'
       raise 'username or password is invalid!' if status_code == '416'
-      raise "Something Weird Happened - your Error code is #{status_code}" \
-      "- please check Mellat documentation for more information" unless ['0'].include? status_code
+      raise "Something Went wrong - Error code is #{status_code}"
     end
   end
 end

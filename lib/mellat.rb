@@ -1,4 +1,6 @@
-require "mellat/version"
+# frozen_string_literal: true
+
+require 'mellat/version'
 require_relative 'mellat/health_check'
 require_relative 'mellat/payment_request'
 require_relative 'mellat/payment_verification'
@@ -9,6 +11,7 @@ require 'yaml'
 require 'json'
 
 module Mellat
+  attr_accessor :config
 
   def self.up?
     Mellat::ClientRequest.new.health_check

@@ -5,7 +5,7 @@ module Mellat
   module Generators
     # Install generator class for mellat gem using in rails
     class InstallGenerator < Rails::Generators::Base
-      source_root File.expand_path('../templates', __FILE__)
+      source_root File.expand_path('templates', __dir__)
       desc 'Mellat Saman initializer for your application'
 
       def copy_initializer
