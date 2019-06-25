@@ -8,11 +8,11 @@ module Mellat
       config = Mellat.configuration
       request_parameters = create_payment_params(params)
       response = send_rest_requests(
-       'https://bpm.shaparak.ir/pgwchannel/services/pgw?wsdl',
-       config.proxy,
-       request_parameters,
-       config.retry_count
-     )
+        'https://bpm.shaparak.ir/pgwchannel/services/pgw?wsdl',
+        config.proxy,
+        request_parameters,
+        config.retry_count
+      )
       parse_token_result(response)
     end
 
@@ -42,7 +42,7 @@ module Mellat
     end
 
     def send_rest_requests(url, proxy, parameters, retry_to)
-      client = Savon::client do
+      client = Savon.client do
         namespace 'http://interfaces.core.sw.bps.com/'
         wsdl url
         proxy proxy
@@ -51,9 +51,9 @@ module Mellat
     rescue Net::OpenTimeout
       retry if (retry_to -= 1).positive?
       raise 'Saman is not available right now, calling web service got time out'
-    rescue Savon::HTTPError => error
+    rescue Savon::HTTPError => e
       retry if (retry_to -= 1).positive?
-      Logger.log error.http.code
+      Logger.log e.http.code
       raise
     end
 
@@ -63,6 +63,7 @@ module Mellat
       return response_code.split(',').last if status_code == '0'
       raise 'server is not capable to response!' if status_code == '34'
       raise 'username or password is invalid!' if status_code == '416'
+
       raise "Something Went wrong - Error code is #{status_code}"
     end
   end
