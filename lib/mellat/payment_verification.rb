@@ -34,10 +34,11 @@ module Mellat
       client.call :bp_verify_request, message: parameters
     rescue Net::OpenTimeout
       retry if (retry_to -= 1).positive?
-      { error: 'Mellat is not available right now, calling web service got time out' }
-    rescue StandardError => e
+      raise 'Saman is not available right now, calling web service got time out'
+    rescue Savon::HTTPError => e
       retry if (retry_to -= 1).positive?
-      { error: e.message }
+      Logger.log e.http.code
+      raise
     end
 
     def parse_verify_result(response)
