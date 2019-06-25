@@ -50,7 +50,7 @@ module Mellat
       client.call :bp_cumulative_dynamic_pay_request, message: parameters
     rescue Net::OpenTimeout
       retry if (retry_to -= 1).positive?
-      raise 'Saman is not available right now, calling web service got time out'
+      raise 'Mellat is not available right now, calling web service got time out'
     rescue Savon::HTTPError => e
       retry if (retry_to -= 1).positive?
       Logger.log e.http.code

@@ -3,7 +3,7 @@ require 'savon/mock/spec_helper'
 require 'active_support/core_ext/integer/time.rb'
 
 describe Mellat do
-  describe "#authenticate" do
+  describe ".payment request" do
     include Savon::SpecHelper
 
     # set Savon in and out of mock mode
@@ -51,7 +51,7 @@ describe Mellat do
 
       it 'gets timeout for getting token' do
         mock_authorize_request_timeout
-        error_message = 'Saman is not available right now, calling web service got time out'
+        error_message = 'Mellat is not available right now, calling web service got time out'
         expect{ Mellat.authorize(params) }.to raise_error(error_message)
       end
     end
