@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="http://interfaces.core.sw.bps.com/">
+  <SOAP-ENV:Body>
+    <ns1:bpCumulativeDynamicPayRequest>
+      <terminalId>1527916</terminalId>
+      <userName>test_username</userName>
+      <userPassword>test_password</userPassword>
+      <orderId>1</orderId>
+      <amount>20000</amount>
+      <localDate>"20190623"</localDate>
+      <localTime>"103149"</localTime>
+      <additionalData>""</additionalData>
+      <callBackUrl>'takhfifan.redirect_url.com'</callBackUrl>
+    </ns1:bpCumulativeDynamicPayRequest>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
