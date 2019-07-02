@@ -4,9 +4,9 @@ require 'active_support/core_ext/integer/time.rb'
 
 module Mellat
   class PaymentRequest
-    attr_reader   :response
+    attr_reader :response
 
-    def initialize(args = {})
+    def initialize(_args = {})
       @response = Response.new
     end
 
@@ -54,13 +54,13 @@ module Mellat
         proxy proxy
       end
       client.call :bp_cumulative_dynamic_pay_request, message: parameters
-      rescue Net::OpenTimeout
-        retry if (retry_to -= 1).positive?
-        raise 'Mellat is not available right now, calling web service got time out'
-      rescue Savon::HTTPError => e
-        retry if (retry_to -= 1).positive?
-        Logger.log e.http.code
-        raise
+    rescue Net::OpenTimeout
+      retry if (retry_to -= 1).positive?
+      raise 'Mellat is not available right now, calling web service got time out'
+    rescue Savon::HTTPError => e
+      retry if (retry_to -= 1).positive?
+      Logger.log e.http.code
+      raise
     end
 
     def get_token(response)

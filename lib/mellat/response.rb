@@ -20,16 +20,12 @@ module Mellat
       body = body[:return]
 
       @status_code = body.split(',').first
+      raise ResponseError, Errors::IDS[@status_code] if @status_code != '0'
 
-      if @status_code != '0'
-        raise ResponseError, Errors::IDS[@status_code]
-      else
-        # if we called bp_verify_request it returns 0 anyway!
-        # and we can say this is a valid response
-        @refid = body.split(',').last
-        @refid
-      end
+      # if we called bp_verify_request it returns 0 anyway!
+      # and we can say this is a valid response
+      @refid = body.split(',').last
+      @refid
     end
   end
 end
-

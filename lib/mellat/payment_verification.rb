@@ -2,9 +2,9 @@
 
 module Mellat
   class PaymentVerification
-    attr_reader  :response
+    attr_reader :response
 
-    def initialize(args = {})
+    def initialize(_args = {})
       @response = Response.new
     end
 
@@ -50,7 +50,7 @@ module Mellat
 
     def verify_valid?(response)
       res = @response.validate(response.body)
-      if res == '0' || res == 0
+      if [0, '0'].include? res
         true
       else
         false
