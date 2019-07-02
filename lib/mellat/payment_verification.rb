@@ -2,19 +2,26 @@
 
 module Mellat
   class PaymentVerification
+    attr_reader  :response
+
+    def initialize(args = {})
+      @response = Response.new
+    end
+
     def verify(params = {})
       config = Mellat.configuration
       request_parameters = create_verify_parameters(params)
       response = verify_payment(
-        config.web_service_wsdl,
+        config.web_service_url_wsdl,
         config.proxy,
         request_parameters,
         config.retry_count
       )
-      parse_verify_result(response)
+      verify_valid?(response)
     end
 
     def create_verify_parameters(params = {})
+      config = Mellat.configuration
       {
         terminalId: config.terminal_id,
         userName: config.username,
@@ -41,13 +48,13 @@ module Mellat
       raise
     end
 
-    def parse_verify_result(response)
-      response_code = response.body[:bp_verify_request][:return]
-      status_code = response_code
-      return true if status_code == '0'
-
-      raise "Something Went wrong - Error code is #{status_code}" unless \
-      ['0'].include? status_code
+    def verify_valid?(response)
+      res = @response.validate(response.body)
+      if res == '0' || res == 0
+        true
+      else
+        false
+      end
     end
   end
 end

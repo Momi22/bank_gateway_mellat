@@ -4,16 +4,22 @@ require 'active_support/core_ext/integer/time.rb'
 
 module Mellat
   class PaymentRequest
+    attr_reader   :response
+
+    def initialize(args = {})
+      @response = Response.new
+    end
+
     def apply(params = {})
       config = Mellat.configuration
       request_parameters = create_payment_params(params)
       response = send_rest_requests(
-        'https://bpm.shaparak.ir/pgwchannel/services/pgw?wsdl',
+        config.web_service_url_wsdl,
         config.proxy,
         request_parameters,
         config.retry_count
       )
-      parse_token_result(response)
+      get_token(response)
     end
 
     private
@@ -48,23 +54,17 @@ module Mellat
         proxy proxy
       end
       client.call :bp_cumulative_dynamic_pay_request, message: parameters
-    rescue Net::OpenTimeout
-      retry if (retry_to -= 1).positive?
-      raise 'Mellat is not available right now, calling web service got time out'
-    rescue Savon::HTTPError => e
-      retry if (retry_to -= 1).positive?
-      Logger.log e.http.code
-      raise
+      rescue Net::OpenTimeout
+        retry if (retry_to -= 1).positive?
+        raise 'Mellat is not available right now, calling web service got time out'
+      rescue Savon::HTTPError => e
+        retry if (retry_to -= 1).positive?
+        Logger.log e.http.code
+        raise
     end
 
-    def parse_token_result(response)
-      response_code = response.body[:bp_cumulative_dynamic_pay_request_response][:return]
-      status_code = response_code.split(',').first
-      return response_code.split(',').last if status_code == '0'
-      raise 'server is not capable to response!' if status_code == '34'
-      raise 'username or password is invalid!' if status_code == '416'
-
-      raise "Something Went wrong - Error code is #{status_code}"
+    def get_token(response)
+      @response.validate(response.body)
     end
   end
 end

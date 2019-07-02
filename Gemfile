@@ -2,7 +2,7 @@ source "https://rubygems.org"
 
 gem 'savon'
 # gem 'rest-client'
-
+gem 'hashdiff'
 group :development, :test do
   gem 'rspec'
   gem 'webmock'
