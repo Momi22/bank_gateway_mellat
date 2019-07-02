@@ -38,21 +38,21 @@ describe Mellat do
         stub_getting_wsdl_definition
         fixture = File.read('spec/mocked_requests/cached_xml/unsuccessful_payment_request.xml')
         savon.expects(:bp_cumulative_dynamic_pay_request).with(message: message).returns(fixture)
-        expect{ Mellat.authorize(params) }.to raise_error(RuntimeError, 'username or password is invalid!')
+        expect{ Mellat.payment_request(params) }.to raise_error(RuntimeError, 'username or password is invalid!')
       end
 
       it 'successful mock payment request to the service' do
         stub_getting_wsdl_definition
         fixture = File.read('spec/mocked_requests/cached_xml/successful_payment_request.xml')
         savon.expects(:bp_cumulative_dynamic_pay_request).with(message: message).returns(fixture)
-        response = Mellat.authorize(params)
+        response = Mellat.payment_request(params)
         expect(response).to eq('sampleToken')
       end
 
       it 'gets timeout for getting token' do
         mock_authorize_request_timeout
         error_message = 'Mellat is not available right now, calling web service got time out'
-        expect{ Mellat.authorize(params) }.to raise_error(error_message)
+        expect{ Mellat.payment_request(params) }.to raise_error(error_message)
       end
     end
   end
