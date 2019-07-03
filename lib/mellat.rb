@@ -5,10 +5,11 @@ require_relative 'mellat/health_check'
 require_relative 'mellat/payment_request'
 require_relative 'mellat/payment_verification'
 require_relative 'mellat/configuration'
+require_relative 'mellat/response'
+require_relative 'mellat/errors'
 
 require 'savon'
 require 'yaml'
-require 'json'
 
 module Mellat
   attr_accessor :config
@@ -17,11 +18,11 @@ module Mellat
     Mellat::ClientRequest.new.health_check
   end
 
-  def self.authorize(params)
+  def self.payment_request(params)
     Mellat::PaymentRequest.new.apply(params)
   end
 
-  def self.verify(params)
-    Mellat::PaymentRequest.new.verify(params)
+  def self.payment_verify(params)
+    Mellat::PaymentVerification.new.verify(params)
   end
 end
